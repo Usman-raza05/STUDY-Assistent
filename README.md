@@ -23,7 +23,7 @@ A web-based AI study assistant built with Python (Flask) that helps students ins
 
 ## 📸 Output Screenshot
 
-![NOVA AI Output](NOVA_outputp.png)
+![NOVA AI Output](NOVA_output.png)
 
    ---
 **Author:** Jensi Pethani
