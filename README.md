@@ -21,5 +21,9 @@ A web-based AI study assistant built with Python (Flask) that helps students ins
    ```bash
    git clone [https://github.com/jensipethani123-cmyk/NOVA-study-assistant.git](https://github.com/jensipethani123-cmyk/NOVA-study-assistant.git)
 
+## 📸 Output Screenshot
+
+![NOVA AI Output](NOVA_outputp.png)
+
    ---
 **Author:** Jensi Pethani
