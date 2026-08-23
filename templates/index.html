@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOVA AI | Study Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        :root { --ink: #edf7f2; --muted: #9aada7; --paper: #121918; --teal: #35b99e; --coral: #ff8f72; --line: #2a3936; }
+        * { box-sizing: border-box; }
+        body { margin: 0; color: var(--ink); font-family: 'DM Sans', sans-serif; background: #050706; min-height: 100vh; }
+        .shell { max-width: 1120px; margin: 0 auto; padding: 30px 24px 70px; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 64px; }
+        .brand { display: flex; align-items: center; gap: 12px; font-weight: 700; letter-spacing: .02em; }
+        .mark { display: grid; place-items: center; width: 40px; height: 40px; border: 3px solid #8be0c1; border-radius: 50%; color: #06100d; background: var(--teal); box-shadow: 0 0 0 5px rgba(53,185,158,.12); font-family: Georgia, serif; font-size: 20px; }
+        .brand-name { letter-spacing: .11em; }
+        .status { color: var(--teal); font-size: 13px; font-weight: 600; }
+        .status::before { content: ''; display: inline-block; width: 7px; height: 7px; margin: 0 8px 1px 0; border-radius: 50%; background: #6bb38c; }
+        .intro { max-width: 710px; margin-bottom: 38px; animation: rise .55s ease both; }
+        .eyebrow { color: var(--coral); font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+        h1 { max-width: 680px; margin: 12px 0 18px; font-family: 'Playfair Display', Georgia, serif; font-size: clamp(42px, 6vw, 76px); line-height: .98; letter-spacing: 0; }
+        .intro p { max-width: 550px; margin: 0; color: var(--muted); font-size: 17px; line-height: 1.65; }
+        .workspace { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr); gap: 22px; align-items: start; }
+        .panel { padding: 28px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); box-shadow: 0 18px 50px rgba(0, 0, 0, .28); }
+        .panel h2 { margin: 0 0 7px; font-size: 20px; }
+        .panel-copy { margin: 0 0 24px; color: var(--muted); font-size: 14px; line-height: 1.5; }
+        .dropzone { display: block; padding: 27px 18px; border: 1.5px dashed #45645d; border-radius: 6px; color: var(--teal); text-align: center; cursor: pointer; transition: background .2s, border-color .2s; }
+        .dropzone:hover, .dropzone.has-file { border-color: var(--teal); background: #182522; }
+        .dropzone strong { display: block; margin-bottom: 6px; font-size: 15px; }
+        .dropzone span { color: var(--muted); font-size: 12px; }
+        input[type=file] { display: none; }
+        .file-name { display: block; min-height: 18px; margin-top: 10px; color: var(--teal); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 19px; }
+        button { min-height: 48px; border: 0; border-radius: 5px; color: #fff; background: var(--teal); font: 600 14px 'DM Sans', sans-serif; cursor: pointer; transition: transform .2s, background .2s; }
+        button:hover { background: #0e554f; transform: translateY(-2px); }
+        button.secondary { color: var(--ink); background: #263431; }
+        button.secondary:hover { background: #344640; }
+        .question { display: flex; gap: 8px; margin-top: 22px; padding-top: 22px; border-top: 1px solid var(--line); }
+        input[type=text] { width: 100%; min-width: 0; padding: 13px 14px; border: 1px solid var(--line); border-radius: 5px; outline: none; color: var(--ink); background: #0a0e0d; font: 14px 'DM Sans', sans-serif; }
+        input[type=text]:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(23,107,99,.1); }
+        .question button { flex: 0 0 92px; background: var(--coral); }
+        .question button:hover { background: #cc6549; }
+        .result { min-height: 350px; max-height: 520px; overflow-y: auto; }
+        .result-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; position: sticky; top: 0; background: var(--paper); padding-bottom: 10px; z-index: 10; border-bottom: 1px solid var(--line); }
+        .result-title { display: flex; align-items: center; gap: 10px; }
+        .ai-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--coral); box-shadow: 0 0 0 5px rgba(228,123,93,.12); }
+        .result-head h2 { margin: 0; }
+        .result-badge { padding: 5px 9px; border-radius: 20px; color: #8be0c1; background: #17372f; font-size: 11px; font-weight: 700; }
+        #output { color: #c1d0ca; line-height: 1.75; font-size: 15px; }
+        #output.empty { display: grid; min-height: 270px; place-items: center; color: #71817b; text-align: center; }
+        #output.loading { color: var(--teal); display: block; padding-top: 20px; }
+        #output h1, #output h2, #output h3 { color: #fff; margin-top: 15px; margin-bottom: 8px; }
+        #output ul, #output ol { padding-left: 20px; }
+        #output strong { color: var(--teal); }
+        @keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 760px) { .shell { padding: 22px 16px 44px; } header { margin-bottom: 42px; } .status { font-size: 11px; } .workspace { grid-template-columns: 1fr; } h1 { font-size: 48px; } .panel { padding: 22px; } .result { min-height: 240px; } }
+    </style>
+</head>
+<body>
+<main class="shell">
+    <header><div class="brand"><span class="mark">N</span><span class="brand-name">NOVA AI</span></div><div class="status">AI ready to help</div></header>
+    <section class="intro"><div class="eyebrow">STUDY SMARTER</div><h1>Understand your notes better.</h1><p>Upload a PDF to get a clear summary, a practice quiz with answers, or an answer to any question.</p></section>
+    <section class="workspace">
+        <div class="panel">
+            <h2>Your PDF</h2><p class="panel-copy">Add your study material to get started[cite: 1].</p>
+            <label class="dropzone" for="pdfFile"><strong>Click to choose a file</strong><span>PDF only • Maximum 10 MB</span><input type="file" id="pdfFile" accept="application/pdf,.pdf"></label>
+            <span class="file-name" id="fileName">No file selected</span>
+            <div class="actions">
+                <button type="button" id="btnSummary">Create summary</button>
+                <button type="button" id="btnQuiz" class="secondary">Create quiz</button>
+            </div>
+            <div class="question">
+                <input type="text" id="userQ" placeholder="Ask a question about your PDF..." maxlength="500">
+                <button type="button" id="btnAsk">Ask</button>
+            </div>
+        </div>
+        <div class="panel result">
+            <div class="result-head">
+                <div class="result-title"><span class="ai-dot"></span><h2>NOVA AI response</h2></div>
+                <span class="result-badge">AI INSIGHT</span>
+            </div>
+            <div id="output" class="empty">Your summary, quiz, or answer<br>will appear here.</div>
+        </div>
+    </section>
+</main>
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+    const fileInput = document.getElementById('pdfFile');
+    const fileName = document.getElementById('fileName');
+    const outputDiv = document.getElementById('output');
+    fileInput.addEventListener('change', function () {
+        const file = this.files[0];
+        if (!file) return;
+        if (file.size > 10 * 1024 * 1024) {
+            this.value = '';
+            fileName.innerText = 'The file must be smaller than 10 MB.';
+            return;
+        }
+        fileName.innerText = file.name;
+        document.querySelector('.dropzone').classList.add('has-file');
+    });
+    async function sendReq(action) {
+        const question = document.getElementById('userQ').value;
+        if (!fileInput.files[0]) {
+            outputDiv.className = 'empty';
+            outputDiv.innerHTML = 'Please select a PDF file first.';
+            return;
+        }
+        if (action === 'question' && !question.trim()) {
+            outputDiv.className = 'empty';
+            outputDiv.innerHTML = 'Please enter your question first.';
+            return;
+        }
+        outputDiv.className = 'loading';
+        outputDiv.innerHTML = 'NOVA AI is reading your notes...';
+        const formData = new FormData();
+        formData.append('pdf', fileInput.files[0]);
+        formData.append('action', action);
+        formData.append('question', question);
+        try {
+            const res = await fetch('/process-pdf', { method: 'POST', body: formData });
+            const data = await res.json();
+            if (data.result) {
+                outputDiv.className = '';
+                outputDiv.innerHTML = marked.parse(data.result);
+            } else {
+                outputDiv.className = 'empty';
+                outputDiv.innerHTML = data.error || 'An error occurred.';
+            }
+        } catch (err) {
+            outputDiv.className = 'empty';
+            outputDiv.innerHTML = 'A connection error occurred. Please try again.';
+        }
+    }
+    document.getElementById('btnSummary').addEventListener('click', () => sendReq('summary'));
+    document.getElementById('btnQuiz').addEventListener('click', () => sendReq('quiz'));
+    document.getElementById('btnAsk').addEventListener('click', () => sendReq('question'));
+});
+</script>
+</body>
+</html>
