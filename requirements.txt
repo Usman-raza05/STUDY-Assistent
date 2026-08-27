@@ -1,0 +1,4 @@
+Flask
+groq
+PyMuPDF
+gunicorn
