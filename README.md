@@ -6,7 +6,7 @@ A modern AI-powered PDF study assistant built with **Python, Flask, and Groq AI*
 
 🚀 **Try the application here:**
 
-👉 [STUDY Assistant Live Demo](RENDER_URL)
+👉 [STUDY Assistant Live Demo](https://study-assistent-m336.onrender.com/)
 
 ---
 
@@ -212,7 +212,7 @@ GROQ_API_KEY=your_groq_api_key
 
 ### 🌍 Live Application
 
-👉 **[Open STUDY Assistant](RENDER_URL)**
+👉 **[Open STUDY Assistant](https://study-assistent-m336.onrender.com/)**
 
 ---
 
